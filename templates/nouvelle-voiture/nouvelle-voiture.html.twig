@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajout de voiture - {{ parent() }}{% endblock %}
+
+{% block body %}
+    <section id="add">
+        <a href="{{ path('app_home') }}">← Retour</a>
+        <h1>Ajouter une voiture</h1>
+        {{ form_start(form) }}
+            <div class="input">
+                {{ form_row(form.name) }}
+            </div>
+            <div class="input">
+                {{ form_row(form.description) }}
+            </div>
+            <div class="flex-input">
+                <div class="input">
+                    {{ form_row(form.monthly_price) }}
+                </div>
+                <div class="input">
+                    {{ form_row(form.daily_price) }}
+                </div>
+            </div>
+            <div class="flex-input">
+                <div class="input">
+                    {{ form_row(form.seats) }}
+                </div>
+                <div class="input">
+                    {{ form_row(form.manual) }}
+                </div>
+            </div>
+            
+            <button class="btn-add">Ajouter</button>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}
