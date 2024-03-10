@@ -6,12 +6,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\VoitureRepository;
-use App\Entity\Voiture;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class VoitureController extends AbstractController
 {
-    public function __construct(private VoitureRepository $voitureRepository){
-
+    public function __construct(private VoitureRepository $voitureRepository, private EntityManagerInterface $entityManager){
     }
 
     #[Route('/', name: 'app_home')]
@@ -35,5 +35,19 @@ class VoitureController extends AbstractController
         return $this->render('voiture/voiture.html.twig', [
             'voiture' => $voiture,
         ]);
+    }
+
+    #[Route('/voiture/{id}/delete', name : 'app_car_delete')]
+    public function deleteVoiture(int $id): Response{
+        $voiture = $this->voitureRepository->find($id);
+
+        if(!$voiture){
+            return $this->redirectToRoute('app_home');
+        }
+
+        $this->entityManager->remove($voiture);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_home');
     }
 }
