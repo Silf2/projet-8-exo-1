@@ -13,21 +13,17 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class VoitureController extends AbstractController
 {
-    public function __construct(private VoitureRepository $voitureRepository, private EntityManagerInterface $entityManager){
-    }
 
     #[Route('/', name: 'app_home')]
     public function index(VoitureRepository $voitureRepository): Response
     {
-        $voitures = $voitureRepository->findAll();
-
         return $this->render('home/home.html.twig', [
-            'voitures' => $voitures,
+            'voitures' => $voitureRepository->findAll(),
         ]);
     }
 
     #[Route('/voiture/add', name : 'app_car_add')]
-    public function addVoiture(Request $request): Response{
+    public function addVoiture(Request $request, EntityManagerInterface $entityManager): Response{
         $voiture = new Voiture();
 
         $form = $this->createForm(VoitureType::class, $voiture);
@@ -36,8 +32,8 @@ class VoitureController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
             $voiture = $form->getData();
 
-            $this->entityManager->persist($voiture);
-            $this->entityManager->flush();
+            $entityManager->persist($voiture);
+            $entityManager->flush();
 
             return $this->redirectToRoute('app_car', ['id' => $voiture->getId()]);
         };
@@ -48,8 +44,9 @@ class VoitureController extends AbstractController
     }
 
     #[Route('/voiture/{id}', name : 'app_car')]
-    public function voiture(int $id): Response{
-        $voiture = $this->voitureRepository->find($id);
+    public function voiture(Voiture $voiture): Response{
+        var_dump($voiture->getId());
+        die;
 
         if(!$voiture){
             return $this->redirectToRoute('app_home');
@@ -61,15 +58,10 @@ class VoitureController extends AbstractController
     }
 
     #[Route('/voiture/{id}/delete', name : 'app_car_delete')]
-    public function deleteVoiture(int $id): Response{
-        $voiture = $this->voitureRepository->find($id);
-
-        if(!$voiture){
-            return $this->redirectToRoute('app_home');
-        }
-
-        $this->entityManager->remove($voiture);
-        $this->entityManager->flush();
+    public function deleteVoiture(EntityManagerInterface $entityManager, Voiture $voiture): Response{
+        
+        $entityManager->remove($voiture);
+        $entityManager->flush();
 
         return $this->redirectToRoute('app_home');
     }
